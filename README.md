@@ -65,6 +65,25 @@ sudo ./double_click_injector -d /dev/input/event3 -c 15
 
 ---
 
+## 🛠️ Compatibility & Troubleshooting
+
+* This tool works **best on vanilla X11 or vanilla KDE/Plasma (like KWin) on Arch Linux** and other distros without extra input restrictions.
+
+* On **Wayland (GNOME, KDE, etc.)**, it *may* work but could be blocked by compositor security policies or sandboxing.
+
+* Some distros like **Ubuntu, Fedora, or others** might have **extra security layers (AppArmor, SELinux)** or **Wayland sandboxing** that block virtual input injection via `uinput`.
+
+* If the injector does not seem to work:
+
+  * Make sure you run it with **root privileges** (`sudo`). (Don't be crazy this root access is required for accessing your mice, there is no shady telemetry or anything going in background which is not safe for you by the program)
+  * Check if your compositor allows virtual input devices.
+  * You might need to adjust security policies or run under X11.
+  * Using a more vanilla desktop environment/compositor usually improves compatibility.
+
+* Always test responsibly and respect server rules!
+
+---
+
 ## ⚠️ Disclaimer
 
 This tool is for **educational purposes** and fair PvP enhancement.
