@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CPS Tester</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 2rem;
+    background: #121212;
+    color: #eee;
+  }
+  h1 {
+    margin-bottom: 1rem;
+  }
+  #click-btn {
+    background: #2979ff;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 4rem;
+    padding: 3rem 6rem;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 6px #0c52d3;
+    transition: background 0.2s ease;
+  }
+  #click-btn:active {
+    background: #0c52d3;
+    box-shadow: 0 3px #0c52d3;
+    transform: translateY(3px);
+  }
+  #stats {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+  }
+</style>
+</head>
+<body>
+
+<h1>Clicks Per Second Tester</h1>
+<button id="click-btn">Click Me!</button>
+
+<div id="stats">
+  <p>Clicks: <span id="click-count">0</span></p>
+  <p>Time: <span id="time-elapsed">0.00</span> s</p>
+  <p>CPS: <span id="cps">0.00</span></p>
+</div>
+
+<script>
+  const clickBtn = document.getElementById('click-btn');
+  const clickCountElem = document.getElementById('click-count');
+  const timeElapsedElem = document.getElementById('time-elapsed');
+  const cpsElem = document.getElementById('cps');
+
+  let clicks = 0;
+  let startTime = null;
+  let timerId = null;
+
+  function reset() {
+    clicks = 0;
+    startTime = null;
+    clickCountElem.textContent = clicks;
+    timeElapsedElem.textContent = '0.00';
+    cpsElem.textContent = '0.00';
+  }
+
+  function updateStats() {
+    const now = performance.now();
+    const elapsed = (now - startTime) / 1000;
+    const cps = clicks / elapsed;
+    clickCountElem.textContent = clicks;
+    timeElapsedElem.textContent = elapsed.toFixed(2);
+    cpsElem.textContent = cps.toFixed(2);
+  }
+
+  clickBtn.addEventListener('click', () => {
+    if (clicks === 0) {
+      startTime = performance.now();
+      // Reset timer to reset after 5 seconds of inactivity
+      timerId = setTimeout(() => reset(), 5000);
+    } else {
+      clearTimeout(timerId);
+      timerId = setTimeout(() => reset(), 5000);
+    }
+
+    clicks++;
+    updateStats();
+  });
+</script>
+
+</body>
+</html>
