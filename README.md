@@ -69,6 +69,8 @@ sudo ./double_click_injector -d /dev/input/event3 -c 15
 This tool is for **educational purposes** and fair PvP enhancement.
 **Don't abuse it** — using this on competitive servers might break the rules.
 
+*In Simple Language*
+Don't be crazy 🗿 , Don't go with insane CPS!!!! Like a 100 cps , That's cool and doable but it will make your memory , cpu a sausage and also by this much cps you are telling servers "hey i am the biggest hacker ever existed now ban me" and they will slap you back too 💀 So go & listen a phonk use usable cps like 15 - 20 , Play pvp and that's it! Your single clicking mice of $5 is now a butterfly clicking god ;) no need to go for a $9999999999 mice just for cps.
 ---
 
 ## 🧑‍💻 Author
