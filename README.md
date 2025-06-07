@@ -10,7 +10,7 @@
 A simple C++ tool that listens to your real mouse **left-clicks** and injects **additional virtual clicks** using the Linux `uinput` interface.  
 You get **higher CPS (clicks per second)** — perfect for Minecraft PvP and bridging, especially on Bedrock Edition.
 
-No double-click mouse? No problem.
+🧷 No double-click mouse? No problem.
 
 ---
 
@@ -39,38 +39,55 @@ cd double-click-injector
 g++ main.cc -o double_click_injector -std=c++14 -lpthread
 ```
 
-> 🧠 Note: Replace `main.cc` with your filename if different.
+> 🧠 Replace `main.cc` with your actual source filename if different.
 
 ---
 
 ## 🚀 Usage
 
-Find your mouse input device:
+First, find your mouse input device:
 
 ```bash
 sudo evtest
 ```
 
-Then run the tool:
+Then run:
 
 ```bash
 sudo ./double_click_injector -d /dev/input/event3 -c 15
 ```
 
-* `-d` = Device path (required)
-* `-c` = CPS rate (optional, default is 10)
+* `-d` → Device path (required)
+* `-c` → CPS rate (optional, default is 10)
 
-> Try between **12–20 CPS** for realistic results. Going too high may get flagged as cheating.
+> 🏁 **Best CPS range:** 12–20.
+> Higher CPS is possible but may get flagged as cheating depending on server rules.
 
 ---
 
 ## ⚠️ Disclaimer
 
 This tool is for **educational purposes** and fair PvP enhancement.
-**Don't abuse it** — using this on competitive servers might break the rules.
 
-*In Simple Language*
-Don't be crazy 🗿 , Don't go with insane CPS!!!! Like a 100 cps , That's cool and doable but it will make your memory , cpu a sausage and also by this much cps you are telling servers "hey i am the biggest hacker ever existed now ban me" and they will slap you back too 💀 So go & listen a phonk use usable cps like 15 - 20 , Play pvp and that's it! Your single clicking mice of $5 is now a butterfly clicking god ;) no need to go for a $9999999999 mice just for cps.
+### 🧠 *In Simple Language*
+
+> Don't be crazy 🗿. Don't go with **insane CPS** like 100.
+> Yeah, it’s doable — but it’ll turn your CPU and memory into sausages 🌭,
+> and you'll basically be telling servers:
+>
+> > “Hey, I’m the biggest hacker ever existed, now ban me.”
+>
+> So they *will* slap you 💀.
+>
+> Instead, just vibe, listen to a phonk beat, stick to **15–20 CPS**,
+> play PvP, and that’s it.
+>
+> Your single-clicking \$5 mouse is now a butterfly-clicking **god**.
+>
+> No need for a ₹9999999999 mouse just for CPS 🤭.
+>
+> And also due to MIT License feel free to do anything , Like anything you want to the project as once you get the source you are the owner not me ;) so don't blame me or contrubutors that "Hey these guys made me crazy at cps now ban there mojang id too 🗿" We are not laiable for any changed as every open source project says.
+
 ---
 
 ## 🧑‍💻 Author
@@ -84,4 +101,4 @@ Made for fellow gamers who don’t want to spend ₹4000 on a “butterfly-click
 
 [MIT](LICENSE)
 
-> Written in 2025. Happy PvPing! 🏹🔥
+> Written in 2025. Happy PvPing! 🏹
