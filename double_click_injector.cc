@@ -23,7 +23,7 @@
  */
 
 // Written by ghgltggamer
-// Happy PvP for non double clicker mice users , Tip don't goo insaane like a 100 cps that's crazy enough to make servers ban your existance from there land entirely without even telling you.
+// Happy PvP for non double clicker mice users
 
 #include <iostream>
 #include <fcntl.h>
@@ -39,7 +39,7 @@ void emit_event(int fd, uint16_t type, uint16_t code, int32_t value) {
     ie.type = type;
     ie.code = code;
     ie.value = value;
-    // Use steady_clock for timestamp
+
     auto now = std::chrono::steady_clock::now();
     auto us = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
     ie.time.tv_sec = us / 1000000;
@@ -93,69 +93,68 @@ int main(int argc, char* argv[]) {
     // Enable mouse button events
     if (ioctl(uinput_fd, UI_SET_EVBIT, EV_KEY) < 0 ||
         ioctl(uinput_fd, UI_SET_KEYBIT, BTN_LEFT) < 0 ||
-        ioctl(uinput_fd, UI_SET_KEYBIT, BTN_RIGHT) < 0) {
+        ioctl(uinput_fd, UI_SET_KEYBIT, BTN_RIGHT) < 0 ||
+        ioctl(uinput_fd, UI_SET_EVBIT, EV_SYN) < 0) {
         perror("ioctl failed");
-    close(uinput_fd);
-    return 1;
-        }
+        close(uinput_fd);
+        return 1;
+    }
 
-        if (ioctl(uinput_fd, UI_SET_EVBIT, EV_SYN) < 0) {
-            perror("ioctl failed");
-            close(uinput_fd);
-            return 1;
-        }
+    struct uinput_user_dev uidev;
+    memset(&uidev, 0, sizeof(uidev));
+    snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "double_click_injector");
+    uidev.id.bustype = BUS_USB;
+    uidev.id.vendor = 0x1234;
+    uidev.id.product = 0x5678;
+    uidev.id.version = 1;
 
-        struct uinput_user_dev uidev;
-        memset(&uidev, 0, sizeof(uidev));
-        snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "double_click_injector");
-        uidev.id.bustype = BUS_USB;
-        uidev.id.vendor = 0x1234;
-        uidev.id.product = 0x5678;
-        uidev.id.version = 1;
+    if (write(uinput_fd, &uidev, sizeof(uidev)) < 0) {
+        perror("Failed to write uinput_user_dev");
+        close(uinput_fd);
+        return 1;
+    }
 
-        if (write(uinput_fd, &uidev, sizeof(uidev)) < 0) {
-            perror("Failed to write uinput_user_dev");
-            close(uinput_fd);
-            return 1;
-        }
+    if (ioctl(uinput_fd, UI_DEV_CREATE) < 0) {
+        perror("Failed to create uinput device");
+        close(uinput_fd);
+        return 1;
+    }
 
-        if (ioctl(uinput_fd, UI_DEV_CREATE) < 0) {
-            perror("Failed to create uinput device");
-            close(uinput_fd);
-            return 1;
-        }
+    std::cout << "Double click injector running on device: " << device << " with CPS: " << cps << "\n";
 
-        std::cout << "Double click injector running on device: " << device << " with CPS: " << cps << "\n";
+    unsigned int delay_us = 1000000 / cps;
 
-        // Calculate delay in microseconds between virtual clicks
-        unsigned int delay_us = 1000000 / cps;
+    int real_fd = open(device, O_RDONLY);
+    if (real_fd < 0) {
+        perror("Failed to open input device");
+        ioctl(uinput_fd, UI_DEV_DESTROY);
+        close(uinput_fd);
+        return 1;
+    }
 
-        // We'll listen to real mouse events and inject virtual clicks on left button press
-        int real_fd = open(device, O_RDONLY);
-        if (real_fd < 0) {
-            perror("Failed to open input device");
-            ioctl(uinput_fd, UI_DEV_DESTROY);
-            close(uinput_fd);
-            return 1;
-        }
-
-        struct input_event ev;
-        while (true) {
-            ssize_t n = read(real_fd, &ev, sizeof(ev));
-            if (n == (ssize_t)sizeof(ev)) {
-                if (ev.type == EV_KEY && ev.code == BTN_LEFT && ev.value == 1) {
-                    // Physical left click detected, inject double click with delay
+    struct input_event ev;
+    while (true) {
+        ssize_t n = read(real_fd, &ev, sizeof(ev));
+        if (n == (ssize_t)sizeof(ev)) {
+            if (ev.type == EV_KEY && ev.value == 1) {
+                if (ev.code == BTN_LEFT) {
                     emit_click(uinput_fd, BTN_LEFT);
                     usleep(delay_us);
                     emit_click(uinput_fd, BTN_LEFT);
-                    std::cout << "Injected double click with delay " << delay_us / 1000 << " ms\n";
+                    std::cout << "Injected LEFT double click with delay " << delay_us / 1000 << " ms\n";
+                } else if (ev.code == BTN_RIGHT) {
+                    emit_click(uinput_fd, BTN_RIGHT);
+                    usleep(delay_us);
+                    emit_click(uinput_fd, BTN_RIGHT);
+                    std::cout << "Injected RIGHT double click with delay " << delay_us / 1000 << " ms\n";
                 }
             }
         }
+    }
 
-        ioctl(uinput_fd, UI_DEV_DESTROY);
-        close(uinput_fd);
-        close(real_fd);
+    ioctl(uinput_fd, UI_DEV_DESTROY);
+    close(uinput_fd);
+    close(real_fd);
 
-        return 0;
+    return 0;
 }
