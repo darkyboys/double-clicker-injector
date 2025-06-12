@@ -34,7 +34,7 @@ sudo pacman -Syu gcc linux-headers
 Then clone and compile:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/double-click-injector.git
+git clone https://github.com/darkyboys/double-click-injector.git
 cd double-click-injector
 g++ main.cc -o double_click_injector -std=c++14 -lpthread
 ```
