@@ -1,30 +1,3 @@
-/*
- * MIT License
- *
- * Copyright (c) 2025 GHGLTGGAMER
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
-
-// Written by ghgltggamer
-// Happy PvP for non double clicker mice users
-
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
@@ -34,8 +7,7 @@
 #include <chrono>
 
 void emit_event(int fd, uint16_t type, uint16_t code, int32_t value) {
-    struct input_event ie;
-    memset(&ie, 0, sizeof(ie));
+    struct input_event ie{};
     ie.type = type;
     ie.code = code;
     ie.value = value;
@@ -54,14 +26,13 @@ void emit_event(int fd, uint16_t type, uint16_t code, int32_t value) {
 void emit_click(int fd, int button) {
     emit_event(fd, EV_KEY, button, 1); // press
     emit_event(fd, EV_SYN, SYN_REPORT, 0);
-
     emit_event(fd, EV_KEY, button, 0); // release
     emit_event(fd, EV_SYN, SYN_REPORT, 0);
 }
 
 int main(int argc, char* argv[]) {
     const char* device = nullptr;
-    int cps = 10;  // default clicks per second
+    int cps = 10;
 
     // Parse CLI args
     for (int i = 1; i < argc; ++i) {
@@ -84,13 +55,15 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    std::cout << "Running kernel-level double-click injector.\n";
+    std::cout << "Listening on " << device << "\n";
+
     int uinput_fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (uinput_fd < 0) {
         perror("Failed to open /dev/uinput");
         return 1;
     }
 
-    // Enable mouse button events
     if (ioctl(uinput_fd, UI_SET_EVBIT, EV_KEY) < 0 ||
         ioctl(uinput_fd, UI_SET_KEYBIT, BTN_LEFT) < 0 ||
         ioctl(uinput_fd, UI_SET_KEYBIT, BTN_RIGHT) < 0 ||
@@ -100,8 +73,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    struct uinput_user_dev uidev;
-    memset(&uidev, 0, sizeof(uidev));
+    struct uinput_user_dev uidev{};
     snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "double_click_injector");
     uidev.id.bustype = BUS_USB;
     uidev.id.vendor = 0x1234;
@@ -120,10 +92,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::cout << "Double click injector running on device: " << device << " with CPS: " << cps << "\n";
-
-    unsigned int delay_us = 1000000 / cps;
-
     int real_fd = open(device, O_RDONLY);
     if (real_fd < 0) {
         perror("Failed to open input device");
@@ -132,7 +100,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    struct input_event ev;
+    unsigned int delay_us = 1000000 / cps;
+
+    struct input_event ev{};
     while (true) {
         ssize_t n = read(real_fd, &ev, sizeof(ev));
         if (n == (ssize_t)sizeof(ev)) {
@@ -141,12 +111,12 @@ int main(int argc, char* argv[]) {
                     emit_click(uinput_fd, BTN_LEFT);
                     usleep(delay_us);
                     emit_click(uinput_fd, BTN_LEFT);
-                    std::cout << "Injected LEFT double click with delay " << delay_us / 1000 << " ms\n";
+                    std::cout << "Injected LEFT double click\n";
                 } else if (ev.code == BTN_RIGHT) {
                     emit_click(uinput_fd, BTN_RIGHT);
                     usleep(delay_us);
                     emit_click(uinput_fd, BTN_RIGHT);
-                    std::cout << "Injected RIGHT double click with delay " << delay_us / 1000 << " ms\n";
+                    std::cout << "Injected RIGHT double click\n";
                 }
             }
         }
@@ -155,6 +125,5 @@ int main(int argc, char* argv[]) {
     ioctl(uinput_fd, UI_DEV_DESTROY);
     close(uinput_fd);
     close(real_fd);
-
     return 0;
 }
