@@ -34,9 +34,10 @@ sudo pacman -Syu gcc linux-headers
 Then clone and compile:
 
 ```bash
-git clone https://github.com/darkyboys/double-clicker-injector.git
-cd double-click-injector
-g++ main.cc -o double_click_injector -std=c++14 -lpthread
+mkdir dci
+git clone https://github.com/darkyboys/double-clicker-injector.git dci
+cd dci
+g++ main.cc -o dci -std=c++14 -lpthread
 ```
 
 > 🧠 Replace `main.cc` with your actual source filename if different.
@@ -54,7 +55,7 @@ sudo evtest
 Then run:
 
 ```bash
-sudo ./double_click_injector -d /dev/input/event3 -c 15
+sudo ./dci -d /dev/input/event3 -c 15
 ```
 
 * `-d` → Device path (required)
